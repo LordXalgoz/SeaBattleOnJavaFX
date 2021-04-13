@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 
 public class Controller {
@@ -147,4 +148,32 @@ public class Controller {
         }
     }
 
+
+    public void canvasFieldClicked(MouseEvent mouseEvent) {
+
+        try {
+            int j = (int) ((mouseEvent.getSceneX() - canvasShootField.getLayoutX()) / dx2);
+            int i = (int) ((mouseEvent.getSceneY() - canvasShootField.getLayoutY()) / dy2);
+
+            serverConnection.SendRequestToServer(i + "|" + j);
+
+            String setSignResult = serverConnection.ReceiveResponseFromServer();
+
+            if(setSignResult.equals("ok")==true){
+                field = serverConnection.ReceiveResponseFromServer();
+                DrawField();
+
+                String gameResult = serverConnection.ReceiveResponseFromServer();
+
+                if(gameResult.equals(CONTINUE_GAME)==false){
+                    ShowDialog(gameResult);
+                }
+            }
+            else if(setSignResult.equals("error")==true){
+                ShowDialog("Неверный ход походите ещё");
+            }
+        } catch (Exception e) {
+            ShowDialog(e.getMessage());
+        }
+    }
 }

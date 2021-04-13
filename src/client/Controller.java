@@ -6,21 +6,36 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
+import javafx.scene.text.Font;
 
 public class Controller {
 
     @FXML
-    Canvas canvasField;
+    Canvas canvasField, canvasField2;
 
     private GraphicsContext gc = null;
     private ServerConnection serverConnection = null;
     private String sign = null;
     private String field = null;
 
+    private double dy, dx, w, h;
+    private final char ATTACK = 'X';
+    private final char SHIP = 'K';
+    private final char MISS = 'O';
+
+    private final String WIN_FIRST_PLAYER = "First player wins";
+    private final String WIN_SECOND_PLAYER = "Second player wins";
+    private final String CONTINUE_GAME = "Continue game";
 
     @FXML
     public void initialize() {
         gc = canvasField.getGraphicsContext2D();
+
+        dy = canvasField.getHeight() / 10;
+        dx = canvasField.getHeight() / 10;
+        w = canvasField.getWidth();
+        h = canvasField.getHeight();
+
         DrawGrid();
     }
 
@@ -30,11 +45,6 @@ public class Controller {
 
     private void DrawGrid() {
         gc.setLineWidth(2.0);
-
-        double dy = canvasField.getHeight() / 10.0;
-        double dx = canvasField.getWidth() / 10.0;
-        double w = canvasField.getWidth();
-        double h = canvasField.getHeight();
 
         for (int i = 1; i < 10; i++)
         {
@@ -49,96 +59,42 @@ public class Controller {
             gc.lineTo(dx*i, h);
             gc.stroke();
         }
+    }
 
-        /* //line x 1
-        gc.moveTo(0, dy);
-        gc.lineTo(w, dy);
-        gc.stroke();
+    private void DrawField()
+    {
+        String[] lines = field.split("\n");
 
-        //line x 2
-        gc.moveTo(0, dy*2);
-        gc.lineTo(w, dy*2);
-        gc.stroke();
+        int fieldSize = 10;
+        char[][] field = new char[fieldSize][fieldSize];
 
-        //line x 3
-        gc.moveTo(0, dy*3);
-        gc.lineTo(w, dy*3);
-        gc.stroke();
+        for (int l = 0; l < fieldSize; l++)
+        {
+            for (int e = 0; e < fieldSize; e++)
+            {
+                field[l][e]=lines[l].charAt(e);
+            }
+        }
 
-        //line x 4
-        gc.moveTo(0, dy*4);
-        gc.lineTo(w, dy*4);
-        gc.stroke();
+        gc.setFont(new Font("Arial", dy / 2));
 
-        //line x 5
-        gc.moveTo(0, dy*5);
-        gc.lineTo(w, dy*5);
-        gc.stroke();
+        for (int i = 0; i < fieldSize; i++)
+        {
+            for (int j = 0; j < fieldSize; j++)
+            {
+                if(field[i][j] == ATTACK)
+                {
+                    ShowDialog("ATTACK");
+                    gc.fillText(Character.toString(ATTACK),  j * dx + dx / 10, i * dy + 2 * dy / 10);
+                }
 
-        //line x 6
-        gc.moveTo(0, dy*6);
-        gc.lineTo(w, dy*6);
-        gc.stroke();
-
-        //line x 7
-        gc.moveTo(0, dy*7);
-        gc.lineTo(w, dy*7);
-        gc.stroke();
-
-        //line x 8
-        gc.moveTo(0, dy*8);
-        gc.lineTo(w, dy*8);
-        gc.stroke();
-
-        //line x 9
-        gc.moveTo(0, dy*9);
-        gc.lineTo(w, dy*9);
-        gc.stroke();
-
-        //line y 1
-        gc.moveTo(dx, 0);
-        gc.lineTo(dx, h);
-        gc.stroke();
-
-        //line y 2
-        gc.moveTo(dx*2, 0);
-        gc.lineTo(dx*2, h);
-        gc.stroke();
-
-        //line y 3
-        gc.moveTo(dx*3, 0);
-        gc.lineTo(dx*3, h);
-        gc.stroke();
-
-        //line y 4
-        gc.moveTo(dx*4, 0);
-        gc.lineTo(dx*4, h);
-        gc.stroke();
-
-        //line y 5
-        gc.moveTo(dx*5, 0);
-        gc.lineTo(dx*5, h);
-        gc.stroke();
-
-        //line y 6
-        gc.moveTo(dx*6, 0);
-        gc.lineTo(dx*6, h);
-        gc.stroke();
-
-        //line y 7
-        gc.moveTo(dx*7, 0);
-        gc.lineTo(dx*7, h);
-        gc.stroke();
-
-        //line y 8
-        gc.moveTo(dx*8, 0);
-        gc.lineTo(dx*8, h);
-        gc.stroke();
-
-        //line y 9
-        gc.moveTo(dx*9, 0);
-        gc.lineTo(dx*9, h);
-        gc.stroke(); */
+                if(field[i][j] == MISS)
+                {
+                    ShowDialog("MISS");
+                    gc.fillText(Character.toString(MISS),  j * dx + dx / 10, i * dy + 2 * dy / 10);
+                }
+            }
+        }
     }
 
     public void btnConnectClick(ActionEvent actionEvent) {

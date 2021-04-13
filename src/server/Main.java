@@ -140,5 +140,16 @@ public class Main
             }
         }
 
+        try {
+            talkingPlayer1.close();
+            talkingPlayer2.close();
+
+            listener.close();
+
+        }
+        catch (Exception e)
+        {
+            Log("some error: " + e.getMessage());
+        }
     }
 }

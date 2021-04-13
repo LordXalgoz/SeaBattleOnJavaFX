@@ -11,14 +11,15 @@ import javafx.scene.text.Font;
 public class Controller {
 
     @FXML
-    Canvas canvasField, canvasField2;
+    Canvas canvasMyField, canvasShootField;
 
-    private GraphicsContext gc = null;
+    private GraphicsContext gc1 = null;
+    private GraphicsContext gc2 = null;
     private ServerConnection serverConnection = null;
     private String sign = null;
     private String field = null;
 
-    private double dy, dx, w, h;
+    private double dy1, dx1, w1, h1, dy2, dx2, w2, h2;
     private final char ATTACK = 'X';
     private final char SHIP = 'K';
     private final char MISS = 'O';
@@ -29,12 +30,18 @@ public class Controller {
 
     @FXML
     public void initialize() {
-        gc = canvasField.getGraphicsContext2D();
+        gc1 = canvasMyField.getGraphicsContext2D();
+        gc2 = canvasShootField.getGraphicsContext2D();
 
-        dy = canvasField.getHeight() / 10;
-        dx = canvasField.getHeight() / 10;
-        w = canvasField.getWidth();
-        h = canvasField.getHeight();
+        dy1 = canvasMyField.getHeight() / 10;
+        dx1 = canvasMyField.getHeight() / 10;
+        w1 = canvasMyField.getWidth();
+        h1 = canvasMyField.getHeight();
+
+        dy2 = canvasShootField.getHeight() / 10;
+        dx2 = canvasShootField.getHeight() / 10;
+        w2 = canvasShootField.getWidth();
+        h2 = canvasShootField.getHeight();
 
         DrawGrid();
     }
@@ -44,20 +51,35 @@ public class Controller {
     }
 
     private void DrawGrid() {
-        gc.setLineWidth(2.0);
+        gc1.setLineWidth(2.0);
+        gc2.setLineWidth(2.0);
 
         for (int i = 1; i < 10; i++)
         {
-            gc.moveTo(0, dy*i);
-            gc.lineTo(w, dy*i);
-            gc.stroke();
+            gc1.moveTo(0, dy1*i);
+            gc1.lineTo(w1, dy1*i);
+            gc1.stroke();
         }
 
         for (int i = 1; i < 10; i++)
         {
-            gc.moveTo(dx*i, 0);
-            gc.lineTo(dx*i, h);
-            gc.stroke();
+            gc1.moveTo(dx1*i, 0);
+            gc1.lineTo(dx1*i, h1);
+            gc1.stroke();
+        }
+
+        for (int i = 1; i < 10; i++)
+        {
+            gc2.moveTo(0, dy2*i);
+            gc2.lineTo(w2, dy2*i);
+            gc2.stroke();
+        }
+
+        for (int i = 1; i < 10; i++)
+        {
+            gc2.moveTo(dx2*i, 0);
+            gc2.lineTo(dx2*i, h2);
+            gc2.stroke();
         }
     }
 
@@ -76,7 +98,19 @@ public class Controller {
             }
         }
 
-        gc.setFont(new Font("Arial", dy / 2));
+        gc1.setFont(new Font("Arial", dy1 / 2));
+        gc2.setFont(new Font("Arial", dy2 / 2));
+
+        for (int i = 0; i < fieldSize; i++)
+        {
+            for (int j = 0; j < fieldSize; j++)
+            {
+                if(field[i][j] == SHIP)
+                {
+                    gc2.fillText(Character.toString(SHIP),  j * dx1 + dx1 / 10, i * dy1 + 2 * dy1 / 10);
+                }
+            }
+        }
 
         for (int i = 0; i < fieldSize; i++)
         {
@@ -85,13 +119,13 @@ public class Controller {
                 if(field[i][j] == ATTACK)
                 {
                     ShowDialog("ATTACK");
-                    gc.fillText(Character.toString(ATTACK),  j * dx + dx / 10, i * dy + 2 * dy / 10);
+                    gc2.fillText(Character.toString(ATTACK),  j * dx2 + dx2 / 10, i * dy2 + 2 * dy2 / 10);
                 }
 
                 if(field[i][j] == MISS)
                 {
                     ShowDialog("MISS");
-                    gc.fillText(Character.toString(MISS),  j * dx + dx / 10, i * dy + 2 * dy / 10);
+                    gc2.fillText(Character.toString(MISS),  j * dx2 + dx2 / 10, i * dy2 + 2 * dy2 / 10);
                 }
             }
         }
@@ -112,4 +146,5 @@ public class Controller {
             ShowDialog(e.getMessage());
         }
     }
+
 }

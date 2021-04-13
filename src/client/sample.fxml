@@ -13,8 +13,7 @@
     <children>
         <Button layoutX="10.0" layoutY="10.0" onAction="#btnConnectClick" text="Приссоединиться к серверу" />
 
-        <Canvas layoutX="10.0" layoutY="50.0" fx:id="canvasField" width="200.0" height="200.0"/>
-
-        <Canvas layoutX="250.0" layoutY="50.0" fx:id="canvasField2" width="200.0" height="200.0"/>
+        <Canvas layoutX="10.0" layoutY="50.0" fx:id="canvasMyField" width="200.0" height="200.0"/>
+        <Canvas layoutX="220.0" layoutY="50.0" fx:id="canvasShootField" width="200.0" height="200.0"/>
     </children>
 </Pane>

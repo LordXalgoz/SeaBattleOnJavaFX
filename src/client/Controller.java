@@ -100,7 +100,7 @@ public class Controller {
         }
 
         gc1.setFont(new Font("Arial", dy1 / 2));
-        gc2.setFont(new Font("Arial", dy2 / 2));
+        gc2.setFont(new Font("Arial", dy2/2));
 
         for (int i = 0; i < fieldSize; i++)
         {
@@ -108,7 +108,7 @@ public class Controller {
             {
                 if(field[i][j] == SHIP)
                 {
-                    gc2.fillText(Character.toString(SHIP),  j * dx1 + dx1 / 10, i * dy1 + 2 * dy1 / 10);
+                    gc1.fillText(Character.toString(SHIP),j*dx1+dx1/3, i*dy1+2*dy1/3);
                 }
             }
         }
@@ -120,13 +120,13 @@ public class Controller {
                 if(field[i][j] == ATTACK)
                 {
                     ShowDialog("ATTACK");
-                    gc2.fillText(Character.toString(ATTACK),  j * dx2 + dx2 / 10, i * dy2 + 2 * dy2 / 10);
+                    gc2.fillText(Character.toString(ATTACK),  j*dx2+dx2/3,i*dy2+2*dy2/3);
                 }
 
                 if(field[i][j] == MISS)
                 {
                     ShowDialog("MISS");
-                    gc2.fillText(Character.toString(MISS),  j * dx2 + dx2 / 10, i * dy2 + 2 * dy2 / 10);
+                    gc2.fillText(Character.toString(MISS),j*dx2+dx2/3,i*dy2+2*dy2/3);
                 }
             }
         }
@@ -135,13 +135,13 @@ public class Controller {
     public void btnConnectClick(ActionEvent actionEvent) {
         try{
             serverConnection = new ServerConnection();
-            sign = serverConnection.ReceiveResponseFromServer();
 
             ShowDialog("Ожидаем 2-го игрока");
 
             field = serverConnection.ReceiveResponseFromServer();
 
             ShowDialog(field);
+            DrawField();
 
         }catch (Exception e){
             ShowDialog(e.getMessage());
@@ -149,7 +149,7 @@ public class Controller {
     }
 
 
-    public void canvasFieldClicked(MouseEvent mouseEvent) {
+    public void canvasShootFieldClicked(MouseEvent mouseEvent) {
 
         try {
             int j = (int) ((mouseEvent.getSceneX() - canvasShootField.getLayoutX()) / dx2);
@@ -160,6 +160,7 @@ public class Controller {
             String setSignResult = serverConnection.ReceiveResponseFromServer();
 
             if(setSignResult.equals("ok")==true){
+
                 field = serverConnection.ReceiveResponseFromServer();
                 DrawField();
 
@@ -168,6 +169,9 @@ public class Controller {
                 if(gameResult.equals(CONTINUE_GAME)==false){
                     ShowDialog(gameResult);
                 }
+
+                field = serverConnection.ReceiveResponseFromServer();
+                DrawField();
             }
             else if(setSignResult.equals("error")==true){
                 ShowDialog("Неверный ход походите ещё");

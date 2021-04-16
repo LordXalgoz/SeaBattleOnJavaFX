@@ -19,64 +19,11 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Sea Battle Client");
-        primaryStage.setScene(new Scene(root, 700, 500));
+        primaryStage.setScene(new Scene(root, 700, 700));
         primaryStage.show();
     }
 
-    static void Log(String msg) {
-        System.out.println(msg);
-    }
-
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args){
         launch(args);
-
-        System.in.read();
-
-        Scanner scanner = new Scanner(System.in);
-
-        Socket talking = null;
-        DataInputStream in = null;
-        DataOutputStream out = null;
-
-
-        boolean isRun;
-
-        try {
-            talking = new Socket(InetAddress.getByName("127.0.0.1"), 37152);
-            Log("server connect us");
-
-            in = new DataInputStream(talking.getInputStream());
-            out = new DataOutputStream(talking.getOutputStream());
-
-            isRun = true;
-        } catch (Exception e) {
-            Log("server connection failed: " + e.getMessage());
-            isRun = false;
-            return;
-        }
-
-        while (isRun) {
-            try {
-                Log("input coordinate (to exit write /exit)");
-                String request = scanner.nextLine();
-
-                out.writeUTF(request);
-                out.flush();
-
-                String response = in.readUTF();
-                Log("from server: " + response);
-
-                if (request.equals("/exit")) {
-                    isRun = false;
-                }
-
-            } catch (Exception e) {
-                Log("server error: " + e.getMessage());
-                isRun = false;
-            }
-        }
-
-        talking.close();
-        Log("client closed");
     }
 }

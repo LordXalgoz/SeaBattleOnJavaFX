@@ -37,7 +37,7 @@ public class Main
         DataOutputStream outPlayer1 = null;
 
         DataInputStream inPlayer2 = null;
-        DataOutputStream outPlayer2 = null;
+        DataOutputStream outPlayer2 = null; // 1 | 1
 
         try {
             talkingPlayer1 = listener.accept();
@@ -85,7 +85,7 @@ public class Main
 
                     String[] params = requestPlayer1.split("|");
                     i = Integer.parseInt(params[0]);
-                    j = Integer.parseInt(params[1]);
+                    j = Integer.parseInt(params[2]);
 
                     shootResult = controller.FirstPlayerShootToSecondPlayer(i,j);
 
@@ -113,7 +113,7 @@ public class Main
 
                     String[] params = requestPlayer2.split("|");
                     i = Integer.parseInt(params[0]);
-                    j = Integer.parseInt(params[1]);
+                    j = Integer.parseInt(params[2]);
 
                     shootResult = controller.SecondPlayerShootToFirstPlayer(i,j);
 

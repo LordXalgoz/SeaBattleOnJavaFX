@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 
@@ -13,6 +14,9 @@ public class Controller {
 
     @FXML
     Canvas canvasMyField, canvasShootField;
+
+    @FXML
+    Button btnConnect;
 
     private GraphicsContext gc1 = null;
     private GraphicsContext gc2 = null;
@@ -99,7 +103,7 @@ public class Controller {
             }
         }
 
-        gc1.setFont(new Font("Arial", dy1 / 2));
+        gc1.setFont(new Font("Arial", dy1/2));
         gc2.setFont(new Font("Arial", dy2/2));
 
         for (int i = 0; i < fieldSize; i++)
@@ -119,13 +123,11 @@ public class Controller {
             {
                 if(field[i][j] == ATTACK)
                 {
-                    ShowDialog("ATTACK");
                     gc2.fillText(Character.toString(ATTACK),  j*dx2+dx2/3,i*dy2+2*dy2/3);
                 }
 
                 if(field[i][j] == MISS)
                 {
-                    ShowDialog("MISS");
                     gc2.fillText(Character.toString(MISS),j*dx2+dx2/3,i*dy2+2*dy2/3);
                 }
             }
@@ -139,10 +141,9 @@ public class Controller {
             ShowDialog("Ожидаем 2-го игрока");
 
             field = serverConnection.ReceiveResponseFromServer();
-
-            ShowDialog(field);
             DrawField();
 
+            btnConnect.setDisable(true);
         }catch (Exception e){
             ShowDialog(e.getMessage());
         }

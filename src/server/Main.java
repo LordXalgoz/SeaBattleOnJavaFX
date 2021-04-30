@@ -27,7 +27,8 @@ class ProcessPlayer extends Thread
     }
 
     public void run() {
-        while(true){
+        boolean doing = true;
+        while(doing == true){
             try
             {
                 String request = inPlayer.readUTF();
@@ -83,9 +84,9 @@ class ProcessPlayer extends Thread
                     case "shootPlayer1":
                         Log("from " + playerName + ": " + request);
 
-                        boolean setSignResultPlayer1 = controller.FirstPlayerShootToSecondPlayer(i,j);
+                        boolean shootResultPlayer1 = controller.FirstPlayerShootToSecondPlayer(i,j);
 
-                        response = setSignResultPlayer1 == true ? "ok" : "error";
+                        response = shootResultPlayer1 == true ? "ok" : "error";
 
                         outPlayer.writeUTF(response);
 
@@ -95,9 +96,9 @@ class ProcessPlayer extends Thread
                     case "shootPlayer2":
                         Log("from " + playerName + ": " + request);
 
-                        boolean setSignResultPlayer2 = controller.SecondPlayerShootToFirstPlayer(i,j);
+                        boolean shootResultPlayer2 = controller.SecondPlayerShootToFirstPlayer(i,j);
 
-                        response = setSignResultPlayer2 == true ? "ok" : "error";
+                        response = shootResultPlayer2 == true ? "ok" : "error";
 
                         outPlayer.writeUTF(response);
 
@@ -119,15 +120,22 @@ class ProcessPlayer extends Thread
 
                         response = controller.GetGameResult();
 
+
                         outPlayer.writeUTF(response);
 
                         Log("to " + playerName + ":" + response);
+
+                        if(response.equals("Continue")==false){
+                            doing=false;
+                        }
+
                         break;
                 }
             }
             catch (IOException e)
             {
                 Log("some error: "+ e.getMessage());
+                doing=false;
             }
         }
     }

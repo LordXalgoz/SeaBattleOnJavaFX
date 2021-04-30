@@ -28,7 +28,7 @@ public class Controller {
 
     public final String WIN_FIRST_PLAYER = "First player wins";
     public final String WIN_SECOND_PLAYER = "Second player wins";
-    public final String CONTINUE_GAME = "Continue game";
+    public final String CONTINUE_GAME = "Continue";
 
     public Controller() {
         firstPlayerMyField = new char[fieldSize][fieldSize];
@@ -81,7 +81,7 @@ public class Controller {
         if (i < 0 || i > fieldSize - 1 || j < 0 || j > fieldSize - 1) {
             return 0;
         }
-        if (myField[i][j] == SHIP || myField[i][j] == MISS) {
+        if (myField[i][j] == DEAD || myField[i][j] == MISS) {
             return 0;
         }
 

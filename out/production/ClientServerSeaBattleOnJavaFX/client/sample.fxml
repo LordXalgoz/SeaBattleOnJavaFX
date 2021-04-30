@@ -11,7 +11,9 @@
       fx:controller="client.Controller"
       xmlns:fx="http://javafx.com/fxml">
     <children>
-        <Button layoutX="10.0" layoutY="10.0" onAction="#btnConnectClick" text="Приссоединиться к серверу" fx:id="btnConnect"/>
+        <Button layoutX="10.0" layoutY="10.0" onAction="#btnConnectClick" text="Присоединиться к серверу" fx:id="btnConnect"/>
+
+        <Label text="Вы играете за: " layoutX="200.0" layoutY="15.0" fx:id="labelPlayer"/>
 
         <Canvas layoutX="10.0" layoutY="50.0" fx:id="canvasMyField" width="200.0" height="200.0" />
         <Canvas layoutX="220.0" layoutY="50.0" fx:id="canvasShootField" width="200.0" height="200.0" onMouseClicked="#canvasShootFieldClicked"/>

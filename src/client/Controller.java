@@ -121,7 +121,7 @@ class ProcessServer extends Thread {
                 }
 
                 if (field[i][j] == MISS) {
-                    gcMf.fillText(Character.toString(DEAD), j * dx1 + dx1 / 3, i * dy1 + 2 * dy1 / 3);
+                    gcMf.fillText(Character.toString(MISS), j * dx1 + dx1 / 3, i * dy1 + 2 * dy1 / 3);
                 }
             }
         }
@@ -164,6 +164,9 @@ class ProcessServer extends Thread {
                 serverConnection.SendRequestToServer("getShootField"+player+"|9|9");
                 shootField = serverConnection.ReceiveResponseFromServer();
 
+                gcMf.clearRect(0,0,canvasMyField.getWidth(),canvasMyField.getHeight());
+                gcSf.clearRect(0,0,canvasShootField.getWidth(),canvasShootField.getHeight());
+
                 DrawGridMyField();
                 DrawGridShootField();
                 DrawMyField();
@@ -179,6 +182,8 @@ class ProcessServer extends Thread {
                 if(player.equals("Player2")==true && currentStep%2==0){
                     canvasShootField.setDisable(false);
                 }
+
+                //todo check win
 
                 Thread.sleep(500);
 

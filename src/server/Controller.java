@@ -1,5 +1,6 @@
 package server;
 
+import java.sql.Struct;
 import java.util.Random;
 
 public class Controller {
@@ -10,11 +11,11 @@ public class Controller {
     private char[][] secondPlayerShootField;
 
     private final char EMPTY = '*';
-    private final char ATTACK = 'X';
+    private final char DEAD = 'X';
     private final char SHIP = 'K';
     private final char MISS = 'M';
 
-    private final int singleShips = 10;
+    private final int countSingleShips = 10;
 
     private int aliveFirstPlayer;
     private int killFirstPlayer;
@@ -45,8 +46,8 @@ public class Controller {
 
         killFirstPlayer = 0;
         killSecondPlayer = 0;
-        aliveFirstPlayer = singleShips;
-        aliveSecondPlayer = singleShips;
+        aliveFirstPlayer = countSingleShips;
+        aliveSecondPlayer = countSingleShips;
 
         currentStep=1;
     }
@@ -64,9 +65,8 @@ public class Controller {
     }
 
     private void PlaceRandomShips(char[][] field) {
-        for (int k = 0; k < singleShips; k++) {
-            int i ;
-            int j ;
+        for (int k = 0; k < countSingleShips; k++) {
+            int i, j;
 
             do {
                 i = random.nextInt(fieldSize);
@@ -86,8 +86,8 @@ public class Controller {
         }
 
         if (myField[i][j] == SHIP) {
-            myField[i][j] = ATTACK;
-            shootField[i][j] = ATTACK;
+            myField[i][j] = DEAD;
+            shootField[i][j] = DEAD;
             return 1;
         }
         if (myField[i][j] == EMPTY) {
@@ -101,6 +101,7 @@ public class Controller {
 
     public boolean FirstPlayerShootToSecondPlayer(int i, int j){
         int result = ShootToField(i,j,secondPlayerMyField,firstPlayerShootField);
+
         if(result == 0)
         {
             return false;
@@ -145,24 +146,12 @@ public class Controller {
         return false;
     }
 
-    private String GetFieldInString(char[][] myField,char[][] shootField, int aliveShips, int killShips) {
-        String output = "My field alive ships: "+aliveShips+"\n";
+    private String GetFieldInString(char[][] field) {
+        String output="";
 
         for (int i = 0; i < fieldSize; i++) {
             for (int j = 0; j < fieldSize; j++) {
-                output += myField[i][j];
-            }
-            output += "\n";
-
-        }
-        output += "\n";
-        output += "\n";
-        output += "\n";
-        output += "Shoot field kill ships: "+killShips+"\n";
-
-        for (int i = 0; i < fieldSize; i++) {
-            for (int j = 0; j < fieldSize; j++) {
-                output += shootField[i][j];
+                output += field[i][j];
             }
             output += "\n";
 
@@ -170,14 +159,24 @@ public class Controller {
         return output;
     }
 
-    public String GetFirstPlayerFields()
+    public String GetFirstPlayerMyField()
     {
-        return GetFieldInString(firstPlayerMyField, firstPlayerShootField, aliveFirstPlayer, killFirstPlayer);
+        return GetFieldInString(firstPlayerMyField);
     }
 
-    public String GetSecondPlayerFields()
+    public String GetFirstPlayerShootField()
     {
-        return GetFieldInString(secondPlayerMyField, secondPlayerShootField, aliveSecondPlayer, killSecondPlayer);
+        return GetFieldInString(firstPlayerShootField);
+    }
+
+    public String GetSecondPlayerMyField()
+    {
+        return GetFieldInString(secondPlayerMyField);
+    }
+
+    public String GetSecondPlayerShootField()
+    {
+        return GetFieldInString(secondPlayerShootField);
     }
 
     public String GetGameResult()

@@ -17,7 +17,6 @@ class ProcessPlayer extends Thread
     private DataOutputStream outPlayer;
     private Controller controller;
     private String playerName;
-    private char sign;
 
     public ProcessPlayer(DataInputStream inPlayer, DataOutputStream outPlayer, Controller controller, String playerName)
     {
@@ -41,27 +40,47 @@ class ProcessPlayer extends Thread
                 int j = Integer.parseInt(params[2]);
 
                 switch (command) {
-                    case "getFieldPlayer1":
+                    case "getMyFieldPlayer1":
                         Log("from " + playerName + ": " + request);
 
-                        response = controller.GetFirstPlayerFields();
+                        response = controller.GetFirstPlayerMyField();
 
                         outPlayer.writeUTF(response);
 
                         Log("to " + playerName + ":\n" + response);
                         break;
 
-                    case "getFieldPlayer2":
+                    case "getMyFieldPlayer2":
                         Log("from " + playerName + ": " + request);
 
-                        response = controller.GetSecondPlayerFields();
+                        response = controller.GetSecondPlayerMyField();
 
                         outPlayer.writeUTF(response);
 
                         Log("to " + playerName + ":\n" + response);
                         break;
 
-                    case "setShootPlayer1":
+                    case "getShootFieldPlayer1":
+                        Log("from " + playerName + ": " + request);
+
+                        response = controller.GetFirstPlayerShootField();
+
+                        outPlayer.writeUTF(response);
+
+                        Log("to " + playerName + ":\n" + response);
+                        break;
+
+                    case "getShootFieldPlayer2":
+                        Log("from " + playerName + ": " + request);
+
+                        response = controller.GetSecondPlayerShootField();
+
+                        outPlayer.writeUTF(response);
+
+                        Log("to " + playerName + ":\n" + response);
+                        break;
+
+                    case "shootPlayer1":
                         Log("from " + playerName + ": " + request);
 
                         boolean setSignResultPlayer1 = controller.FirstPlayerShootToSecondPlayer(i,j);
@@ -73,7 +92,7 @@ class ProcessPlayer extends Thread
                         Log("to " + playerName + ":" + response);
                         break;
 
-                    case "setShootPlayer2":
+                    case "shootPlayer2":
                         Log("from " + playerName + ": " + request);
 
                         boolean setSignResultPlayer2 = controller.SecondPlayerShootToFirstPlayer(i,j);
@@ -95,7 +114,7 @@ class ProcessPlayer extends Thread
                         Log("to " + playerName + ":" + response);
                         break;
 
-                    case "gameresult":
+                    case "gameResult":
                         Log("from " + playerName + ": " + request);
 
                         response = controller.GetGameResult();
@@ -120,69 +139,69 @@ public class Main
         System.out.println(msg);
     }
 
-    public static void main(String[] args) throws IOException {
-        System.in.read();
+    public static void main(String[] args) throws IOException, InterruptedException {
+        while(true) {
 
-        Controller controller = new Controller();
+            Controller controller = new Controller();
 
-        ServerSocket listener = null;
+            ServerSocket listener = null;
 
-        try {
-            listener = new ServerSocket(37152, 1, InetAddress.getByName("127.0.0.1"));
-            Log("server is started");
-        } catch (Exception e) {
-            Log("failed to start server: " + e.getMessage());
-            return;
+            try {
+                listener = new ServerSocket(37152, 1, InetAddress.getByName("127.0.0.1"));
+                Log("server is started");
+            } catch (Exception e) {
+                Log("failed to start server: " + e.getMessage());
+                return;
+            }
+
+            Log("server is listening");
+
+            Socket talkingPlayer1 = null;
+            Socket talkingPlayer2 = null;
+
+            DataInputStream inPlayer1 = null;
+            DataOutputStream outPlayer1 = null;
+
+            DataInputStream inPlayer2 = null;
+            DataOutputStream outPlayer2 = null;
+
+            try {
+                talkingPlayer1 = listener.accept();
+                Log("player1 is connected");
+
+                inPlayer1 = new DataInputStream(talkingPlayer1.getInputStream());
+                outPlayer1 = new DataOutputStream(talkingPlayer1.getOutputStream());
+
+                outPlayer1.writeUTF("Player1");
+
+            } catch (Exception e) {
+                Log("player1 error: " + e.getMessage());
+                return;
+            }
+
+            ProcessPlayer processPlayer1 = new ProcessPlayer(inPlayer1, outPlayer1, controller, "player1");
+            processPlayer1.start();
+
+            try {
+                talkingPlayer2 = listener.accept();
+                Log("player2 is connected");
+
+                inPlayer2 = new DataInputStream(talkingPlayer2.getInputStream());
+                outPlayer2 = new DataOutputStream(talkingPlayer2.getOutputStream());
+
+                outPlayer2.writeUTF("Player2");
+            } catch (Exception e) {
+                Log("player2 error: " + e.getMessage());
+                return;
+            }
+
+            ProcessPlayer processPlayer2 = new ProcessPlayer(inPlayer2, outPlayer2, controller, "player2");
+            processPlayer2.start();
+
+            processPlayer1.join();
+            processPlayer2.join();
+
+            listener.close();
         }
-
-        Log("server is listening");
-
-        Socket talkingPlayer1 = null;
-        Socket talkingPlayer2 = null;
-
-        DataInputStream inPlayer1 = null;
-        DataOutputStream outPlayer1 = null;
-
-        DataInputStream inPlayer2 = null;
-        DataOutputStream outPlayer2 = null; // 1 | 1
-
-        try {
-            talkingPlayer1 = listener.accept();
-            Log("player1 is connected");
-
-            inPlayer1 = new DataInputStream(talkingPlayer1.getInputStream());
-            outPlayer1 = new DataOutputStream(talkingPlayer1.getOutputStream());
-
-            outPlayer1.writeUTF("player1");
-
-
-
-        } catch (Exception e)
-        {
-            Log("player1 error: " + e.getMessage());
-            return;
-        }
-
-        ProcessPlayer processPlayer1 = new ProcessPlayer(inPlayer1, outPlayer1, controller, "player1");
-        processPlayer1.start();
-
-        try {
-            talkingPlayer2 = listener.accept();
-            Log("player2 is connected");
-
-            inPlayer2 = new DataInputStream(talkingPlayer2.getInputStream());
-            outPlayer2 = new DataOutputStream(talkingPlayer2.getOutputStream());
-
-            outPlayer2.writeUTF("player2");
-
-
-        } catch (Exception e)
-        {
-            Log("player2 error: " + e.getMessage());
-            return;
-        }
-
-        ProcessPlayer processPlayer2 = new ProcessPlayer(inPlayer2, outPlayer2, controller, "player2");
-        processPlayer2.start();
     }
 }

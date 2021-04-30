@@ -197,8 +197,6 @@ public class Controller {
     private ServerConnection serverConnection = null;
     private String player = null;
 
-
-
     @FXML
     public void initialize() {
 
@@ -212,6 +210,15 @@ public class Controller {
         try{
             serverConnection = new ServerConnection();
             player = serverConnection.ReceiveResponseFromServer();
+
+            if (player.equals("Player1") == true) {
+                ShowDialog("Вы играете за Player1 - ожидаем подключение другого игрока");
+                canvasField.setDisable(false);
+            }
+
+            if (sign.equals("O") == true) {
+                ShowDialog("Вы играете за O");
+            }
 
             ShowDialog("Ожидаем 2-го игрока");
 

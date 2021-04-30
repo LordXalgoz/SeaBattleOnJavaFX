@@ -17,6 +17,7 @@ class ProcessPlayer extends Thread
     private DataOutputStream outPlayer;
     private Controller controller;
     private String playerName;
+    private char sign;
 
     public ProcessPlayer(DataInputStream inPlayer, DataOutputStream outPlayer, Controller controller, String playerName)
     {
@@ -33,26 +34,75 @@ class ProcessPlayer extends Thread
                 String request = inPlayer.readUTF();
                 String response;
 
-                Log("from "+playerName+": "+request);
                 String[] params = request.split("\\|");
 
                 String command = params[0];
                 int i = Integer.parseInt(params[1]);
                 int j = Integer.parseInt(params[2]);
 
-                switch (command){
-                    case "getfield":
+                switch (command) {
+                    case "getFieldPlayer1":
+                        Log("from " + playerName + ": " + request);
+
                         response = controller.GetFirstPlayerFields();
+
                         outPlayer.writeUTF(response);
-                        Log("to "+playerName+": \n"+ response);
+
+                        Log("to " + playerName + ":\n" + response);
                         break;
-                    case "setshoot":
-                        boolean setPlayerResult = controller.FirstPlayerShootToSecondPlayer(i,j);
 
-                        response = setPlayerResult == true ? "ok" : "error";
+                    case "getFieldPlayer2":
+                        Log("from " + playerName + ": " + request);
+
+                        response = controller.GetSecondPlayerFields();
 
                         outPlayer.writeUTF(response);
-                        Log("to "+playerName+": " + response);
+
+                        Log("to " + playerName + ":\n" + response);
+                        break;
+
+                    case "setShootPlayer1":
+                        Log("from " + playerName + ": " + request);
+
+                        boolean setSignResultPlayer1 = controller.FirstPlayerShootToSecondPlayer(i,j);
+
+                        response = setSignResultPlayer1 == true ? "ok" : "error";
+
+                        outPlayer.writeUTF(response);
+
+                        Log("to " + playerName + ":" + response);
+                        break;
+
+                    case "setShootPlayer2":
+                        Log("from " + playerName + ": " + request);
+
+                        boolean setSignResultPlayer2 = controller.SecondPlayerShootToFirstPlayer(i,j);
+
+                        response = setSignResultPlayer2 == true ? "ok" : "error";
+
+                        outPlayer.writeUTF(response);
+
+                        Log("to " + playerName + ":" + response);
+                        break;
+
+                    case "currentStep":
+                        Log("from " + playerName + ": " + request);
+
+                        response = Integer.toString(controller.GetCurrentStep());
+
+                        outPlayer.writeUTF(response);
+
+                        Log("to " + playerName + ":" + response);
+                        break;
+
+                    case "gameresult":
+                        Log("from " + playerName + ": " + request);
+
+                        response = controller.GetGameResult();
+
+                        outPlayer.writeUTF(response);
+
+                        Log("to " + playerName + ":" + response);
                         break;
                 }
             }
@@ -105,6 +155,8 @@ public class Main
 
             outPlayer1.writeUTF("player1");
 
+
+
         } catch (Exception e)
         {
             Log("player1 error: " + e.getMessage());
@@ -118,10 +170,11 @@ public class Main
             talkingPlayer2 = listener.accept();
             Log("player2 is connected");
 
-            inPlayer2 = new DataInputStream(talkingPlayer1.getInputStream());
-            outPlayer2 = new DataOutputStream(talkingPlayer1.getOutputStream());
+            inPlayer2 = new DataInputStream(talkingPlayer2.getInputStream());
+            outPlayer2 = new DataOutputStream(talkingPlayer2.getOutputStream());
 
-            outPlayer1.writeUTF("player2");
+            outPlayer2.writeUTF("player2");
+
 
         } catch (Exception e)
         {

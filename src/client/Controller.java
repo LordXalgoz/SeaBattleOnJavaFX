@@ -1,5 +1,6 @@
 package client;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
@@ -19,10 +20,24 @@ class ProcessServer extends Thread {
     private GraphicsContext gc1,gc2;
     private String field = null;
 
+    private String sign = null;
+
     private double dy1, dx1, w1, h1, dy2, dx2, w2, h2;
     private final char ATTACK = 'X';
     private final char SHIP = 'K';
     private final char MISS = 'M';
+
+    private final String WIN_FIRST_PLAYER = "First player wins";
+    private final String WIN_SECOND_PLAYER = "Second player wins";
+    private final String CONTINUE_GAME = "Continue game";
+
+    private void ShowDialog(String message) {
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                new Alert(Alert.AlertType.CONFIRMATION, message).showAndWait();
+            }
+        });
+    }
 
     public ProcessServer(ServerConnection serverConnection, Canvas canvasMyField, Canvas canvasShootField) {
         this.canvasMyField = canvasMyField;
@@ -128,10 +143,41 @@ class ProcessServer extends Thread {
             try {
                 field = serverConnection.ReceiveResponseFromServer();
 
+                int currentStep = Integer.parseInt(serverConnection.ReceiveResponseFromServer());
+
                 DrawGrid();
                 DrawField();
 
-                Thread.sleep(200);
+                if(currentStep%2==1){
+                    canvasShootField.setDisable(false);
+                }
+
+                if(currentStep%2==0){
+                    canvasShootField.setDisable(false);
+                }
+
+
+                serverConnection.SendRequestToServer("gameresult|9|9");
+                String gameResult = serverConnection.ReceiveResponseFromServer();
+
+                if(gameResult.equals(CONTINUE_GAME)==false){
+                    canvasShootField.setDisable(true);
+
+                    switch (gameResult)
+                    {
+                        case WIN_FIRST_PLAYER:
+                            ShowDialog("Победил первый игрок");
+                            break;
+                        case WIN_SECOND_PLAYER:
+                            ShowDialog("Победил второй игрок");
+                            break;
+                    }
+
+                    break;
+                }
+
+
+                Thread.sleep(500);
 
             } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
@@ -151,9 +197,7 @@ public class Controller {
     private ServerConnection serverConnection = null;
     private String player = null;
 
-    private final String WIN_FIRST_PLAYER = "First player wins";
-    private final String WIN_SECOND_PLAYER = "Second player wins";
-    private final String CONTINUE_GAME = "Continue game";
+
 
     @FXML
     public void initialize() {

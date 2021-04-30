@@ -21,6 +21,8 @@ public class Controller {
     private int aliveSecondPlayer;
     private int killSecondPlayer;
 
+    private int currentStep;
+
     private final Random random = new Random();
 
     public final String WIN_FIRST_PLAYER = "First player wins";
@@ -45,6 +47,12 @@ public class Controller {
         killSecondPlayer = 0;
         aliveFirstPlayer = singleShips;
         aliveSecondPlayer = singleShips;
+
+        currentStep=1;
+    }
+
+    public int GetCurrentStep(){
+        return currentStep;
     }
 
     private void ClearField(char[][] field) {
@@ -57,8 +65,8 @@ public class Controller {
 
     private void PlaceRandomShips(char[][] field) {
         for (int k = 0; k < singleShips; k++) {
-            int i;
-            int j;
+            int i ;
+            int j ;
 
             do {
                 i = random.nextInt(fieldSize);
@@ -178,6 +186,5 @@ public class Controller {
 
         return CONTINUE_GAME;
     }
-
 
 }

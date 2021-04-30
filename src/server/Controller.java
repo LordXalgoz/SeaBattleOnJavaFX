@@ -109,10 +109,14 @@ public class Controller {
         {
             killFirstPlayer++;
             aliveSecondPlayer--;
+
+            currentStep++;
+
             return true;
         }
         if(result == 2)
         {
+            currentStep++;
             return true;
         }
 
@@ -129,10 +133,12 @@ public class Controller {
         {
             killSecondPlayer++;
             aliveFirstPlayer--;
+            currentStep++;
             return true;
         }
         if(result == 2)
         {
+            currentStep++;
             return true;
         }
 

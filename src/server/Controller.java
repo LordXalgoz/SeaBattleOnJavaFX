@@ -12,7 +12,7 @@ public class Controller {
     private final char EMPTY = '*';
     private final char ATTACK = 'X';
     private final char SHIP = 'K';
-    private final char MISS = 'O';
+    private final char MISS = 'M';
 
     private final int singleShips = 10;
 

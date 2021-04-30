@@ -10,49 +10,39 @@ import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 
-public class Controller {
+import java.io.IOException;
 
-    @FXML
-    Canvas canvasMyField, canvasShootField;
+class ProcessServer extends Thread {
+    private Canvas canvasMyField, canvasShootField;
+    private ServerConnection serverConnection;
 
-    @FXML
-    Button btnConnect;
-
-    private GraphicsContext gc1 = null;
-    private GraphicsContext gc2 = null;
-    private ServerConnection serverConnection = null;
-    private String sign = null;
+    private GraphicsContext gc1,gc2;
     private String field = null;
 
     private double dy1, dx1, w1, h1, dy2, dx2, w2, h2;
     private final char ATTACK = 'X';
     private final char SHIP = 'K';
-    private final char MISS = 'O';
+    private final char MISS = 'M';
 
-    private final String WIN_FIRST_PLAYER = "First player wins";
-    private final String WIN_SECOND_PLAYER = "Second player wins";
-    private final String CONTINUE_GAME = "Continue game";
+    public ProcessServer(ServerConnection serverConnection, Canvas canvasMyField, Canvas canvasShootField) {
+        this.canvasMyField = canvasMyField;
+        this.canvasShootField = canvasShootField;
+        this.serverConnection = serverConnection;
 
-    @FXML
-    public void initialize() {
         gc1 = canvasMyField.getGraphicsContext2D();
         gc2 = canvasShootField.getGraphicsContext2D();
 
         dy1 = canvasMyField.getHeight() / 10;
-        dx1 = canvasMyField.getHeight() / 10;
+        dx1 = canvasMyField.getWidth() / 10;
         w1 = canvasMyField.getWidth();
         h1 = canvasMyField.getHeight();
 
         dy2 = canvasShootField.getHeight() / 10;
-        dx2 = canvasShootField.getHeight() / 10;
+        dx2 = canvasShootField.getWidth() / 10;
         w2 = canvasShootField.getWidth();
         h2 = canvasShootField.getHeight();
 
-        DrawGrid();
-    }
 
-    private void ShowDialog(String message) {
-        new Alert(Alert.AlertType.CONFIRMATION,message).showAndWait();
     }
 
     private void DrawGrid() {
@@ -88,8 +78,7 @@ public class Controller {
         }
     }
 
-    private void DrawField()
-    {
+    private void DrawField() {
         String[] lines = field.split("\n");
 
         int fieldSize = 10;
@@ -134,16 +123,58 @@ public class Controller {
         }
     }
 
+    public void run() {
+        while (true) {
+            try {
+                field = serverConnection.ReceiveResponseFromServer();
+
+                DrawGrid();
+                DrawField();
+
+                Thread.sleep(200);
+
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+public class Controller {
+
+    @FXML
+    Canvas canvasMyField, canvasShootField;
+
+    @FXML
+    Button btnConnect;
+
+    private ServerConnection serverConnection = null;
+    private String player = null;
+
+    private final String WIN_FIRST_PLAYER = "First player wins";
+    private final String WIN_SECOND_PLAYER = "Second player wins";
+    private final String CONTINUE_GAME = "Continue game";
+
+    @FXML
+    public void initialize() {
+
+    }
+
+    private void ShowDialog(String message) {
+        new Alert(Alert.AlertType.CONFIRMATION,message).showAndWait();
+    }
+
     public void btnConnectClick(ActionEvent actionEvent) {
         try{
             serverConnection = new ServerConnection();
+            player = serverConnection.ReceiveResponseFromServer();
 
             ShowDialog("Ожидаем 2-го игрока");
 
-            field = serverConnection.ReceiveResponseFromServer();
-            DrawField();
-
             btnConnect.setDisable(true);
+
+            ProcessServer processServer = new ProcessServer(serverConnection, canvasMyField, canvasShootField);
+            processServer.start();
         }catch (Exception e){
             ShowDialog(e.getMessage());
         }
@@ -153,28 +184,14 @@ public class Controller {
     public void canvasShootFieldClicked(MouseEvent mouseEvent) {
 
         try {
-            int j = (int) ((mouseEvent.getSceneX() - canvasShootField.getLayoutX()) / dx2);
-            int i = (int) ((mouseEvent.getSceneY() - canvasShootField.getLayoutY()) / dy2);
+            int j = (int) ((mouseEvent.getSceneX() - canvasShootField.getLayoutX()) / canvasShootField.getWidth() / 10);
+            int i = (int) ((mouseEvent.getSceneY() - canvasShootField.getLayoutY()) / canvasShootField.getHeight() / 10);
 
             serverConnection.SendRequestToServer(i + "|" + j);
 
-            String setSignResult = serverConnection.ReceiveResponseFromServer();
+            String setPlayerResult = serverConnection.ReceiveResponseFromServer();
 
-            if(setSignResult.equals("ok")==true){
-
-                field = serverConnection.ReceiveResponseFromServer();
-                DrawField();
-
-                String gameResult = serverConnection.ReceiveResponseFromServer();
-
-                if(gameResult.equals(CONTINUE_GAME)==false){
-                    ShowDialog(gameResult);
-                }
-
-                field = serverConnection.ReceiveResponseFromServer();
-                DrawField();
-            }
-            else if(setSignResult.equals("error")==true){
+            if(setPlayerResult.equals("error")==true){
                 ShowDialog("Неверный ход походите ещё");
             }
         } catch (Exception e) {

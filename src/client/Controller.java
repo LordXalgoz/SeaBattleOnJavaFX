@@ -16,6 +16,9 @@ import java.io.IOException;
 
 class ProcessServer extends Thread {
     private Canvas canvasMyField, canvasShootField;
+    private Button btnConnect;
+    Label labelAlive, labelKill;
+
     private ServerConnection serverConnection;
 
     private GraphicsContext gcMf, gcSf;
@@ -32,7 +35,7 @@ class ProcessServer extends Thread {
 
     private final String WIN_FIRST_PLAYER = "First player wins";
     private final String WIN_SECOND_PLAYER = "Second player wins";
-    private final String CONTINUE_GAME = "Continue game";
+    private final String CONTINUE_GAME = "Continue";
 
     private void ShowDialog(String message) {
         Platform.runLater(new Runnable() {
@@ -43,10 +46,13 @@ class ProcessServer extends Thread {
         });
     }
 
-    public ProcessServer(ServerConnection serverConnection, Canvas canvasMyField, Canvas canvasShootField, String player) {
+    public ProcessServer(ServerConnection serverConnection, Canvas canvasMyField, Canvas canvasShootField, String player, Button btnConnect, Label labelAlive, Label labelKill) {
         this.canvasMyField = canvasMyField;
         this.canvasShootField = canvasShootField;
         this.serverConnection = serverConnection;
+        this.btnConnect = btnConnect;
+        this.labelAlive = labelAlive;
+        this.labelKill = labelKill;
         this.player = player;
 
 
@@ -183,43 +189,59 @@ class ProcessServer extends Thread {
                     canvasShootField.setDisable(false);
                 }
 
-                //todo check win
+                if(player.equals("Player1")==true){
+                    serverConnection.SendRequestToServer("getAliveFirstPlayer|9|9");
+                    String aliveShips = serverConnection.ReceiveResponseFromServer();
 
-                Thread.sleep(500);
+                    serverConnection.SendRequestToServer("getKillFirstPlayer|9|9");
+                    String killShips = serverConnection.ReceiveResponseFromServer();
 
-                /*myField = serverConnection.ReceiveResponseFromServer();
 
-                int currentStep = Integer.parseInt(serverConnection.ReceiveResponseFromServer());
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            labelAlive.setText("Осталось живых кораблей: "+aliveShips);
+                            labelKill.setText("Кораблей убито: "+killShips);
+                        }
+                    });
 
-                DrawGrid();
-                DrawField();
-
-                if (currentStep % 2 == 1) {
-                    canvasShootField.setDisable(false);
                 }
 
-                if (currentStep % 2 == 0) {
-                    canvasShootField.setDisable(false);
+                if(player.equals("Player2")==true){
+                    serverConnection.SendRequestToServer("getAliveSecondPlayer|9|9");
+                    String aliveShips = serverConnection.ReceiveResponseFromServer();
+
+                    serverConnection.SendRequestToServer("getKillSecondPlayer|9|9");
+                    String killShips = serverConnection.ReceiveResponseFromServer();
+
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            labelAlive.setText("Осталось живых кораблей: "+aliveShips);
+                            labelKill.setText("Кораблей убито: "+killShips);
+                        }
+                    });
                 }
 
-                serverConnection.SendRequestToServer("gameresult|9|9");
+                serverConnection.SendRequestToServer("gameResult|9|9");
                 String gameResult = serverConnection.ReceiveResponseFromServer();
 
-                if (gameResult.equals(CONTINUE_GAME) == false) {
-                    canvasShootField.setDisable(true);
+                if(gameResult.equals(CONTINUE_GAME)==false){
 
-                    switch (gameResult) {
+                    switch (gameResult)
+                    {
                         case WIN_FIRST_PLAYER:
-                            ShowDialog("Победил первый игрок");
+                            ShowDialog("Победил Player1");
                             break;
                         case WIN_SECOND_PLAYER:
-                            ShowDialog("Победил второй игрок");
+                            ShowDialog("Победил Player2");
                             break;
                     }
 
-                    break;
-                }*/
-
+                    doing=false;
+                    canvasShootField.setDisable(true);
+                    btnConnect.setDisable(false);
+                }
 
                 Thread.sleep(500);
 
@@ -240,7 +262,8 @@ public class Controller {
     Button btnConnect;
 
     @FXML
-    Label labelPlayer;
+    Label labelPlayer, labelAlive, labelKill;
+
 
     private ServerConnection serverConnection = null;
     private String player = null;
@@ -275,7 +298,7 @@ public class Controller {
 
             btnConnect.setDisable(true);
 
-            ProcessServer processServer = new ProcessServer(serverConnection, canvasMyField, canvasShootField, player);
+            ProcessServer processServer = new ProcessServer(serverConnection, canvasMyField, canvasShootField, player, btnConnect, labelAlive, labelKill);
             processServer.start();
 
         } catch (Exception e) {

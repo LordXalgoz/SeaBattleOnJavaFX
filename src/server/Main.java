@@ -130,6 +130,46 @@ class ProcessPlayer extends Thread
                         }
 
                         break;
+
+                    case "getAliveFirstPlayer":
+                        Log("from " + playerName + ": " + request);
+
+                        response = Integer.toString(controller.getAliveFirstPlayer());
+
+                        outPlayer.writeUTF(response);
+
+                        Log("to " + playerName + ":" + response);
+                        break;
+
+                    case "getKillFirstPlayer":
+                        Log("from " + playerName + ": " + request);
+
+                        response = Integer.toString(controller.getKillFirstPlayer());
+
+                        outPlayer.writeUTF(response);
+
+                        Log("to " + playerName + ":" + response);
+                        break;
+
+                    case "getAliveSecondPlayer":
+                        Log("from " + playerName + ": " + request);
+
+                        response = Integer.toString(controller.getAliveSecondPlayer());
+
+                        outPlayer.writeUTF(response);
+
+                        Log("to " + playerName + ":" + response);
+                        break;
+
+                    case "getKillSecondPlayer":
+                        Log("from " + playerName + ": " + request);
+
+                        response = Integer.toString(controller.getKillSecondPlayer());
+
+                        outPlayer.writeUTF(response);
+
+                        Log("to " + playerName + ":" + response);
+                        break;
                 }
             }
             catch (IOException e)

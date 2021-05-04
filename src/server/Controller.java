@@ -15,7 +15,7 @@ public class Controller {
     private final char SHIP = 'K';
     private final char MISS = 'M';
 
-    private final int countSingleShips = 10;
+    private final int countSingleShips = 2;
 
     private int aliveFirstPlayer;
     private int killFirstPlayer;
@@ -192,4 +192,19 @@ public class Controller {
         return CONTINUE_GAME;
     }
 
+    public int getAliveFirstPlayer() {
+        return aliveFirstPlayer;
+    }
+
+    public int getKillFirstPlayer() {
+        return killFirstPlayer;
+    }
+
+    public int getAliveSecondPlayer() {
+        return aliveSecondPlayer;
+    }
+
+    public int getKillSecondPlayer() {
+        return killSecondPlayer;
+    }
 }
